@@ -1,68 +1,57 @@
-import { Button, Container, DropdownMenu } from "@radix-ui/themes";
+import { Table } from "@radix-ui/themes";
 import React, { useEffect, useState } from "react";
 import { fetchData } from "../services/dropdown.service";
 
 const Short_polling = () => {
-  const [getCountries, setGetCountries] = useState([]);
-  const [selectedCountry, setSelectedCountry] = useState(null);
-
-  const handleChange = (country) => {
-    setSelectedCountry(country);
-  };
+  const [orders, setOrders] = useState([]);
 
   const getData = async () => {
     try {
-      const result = await fetchData("/get");
+      const result = await fetchData("/orders/get");
 
       console.log(result);
 
-      setGetCountries(result);
+      setOrders(result);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
 
   useEffect(() => {
-    //intially fetch the data
+    //intially update the data
     getData();
 
-    //setup polling with every 10-s interval
     const pollingInterval = setInterval(() => {
       getData();
     }, 10000);
 
     return () => clearInterval(pollingInterval);
   }, []);
+
   return (
-    <div>
-      <Container>
-        <DropdownMenu.Root>
-          <DropdownMenu.Trigger>
-            <Button variant="soft">
-              {selectedCountry ? selectedCountry.name : "Select a Country"}
-              <DropdownMenu.TriggerIcon />
-            </Button>
-          </DropdownMenu.Trigger>
-          <DropdownMenu.Content variant="soft">
-            {/* Check if getCountries has data */}
-            {getCountries.length > 0 ? (
-              getCountries.map((country, index) => (
-                <DropdownMenu.Item
-                  key={index}
-                  onClick={() => handleChange(country)}
-                >
-                  {country.name}
-                </DropdownMenu.Item>
-              ))
-            ) : (
-              <DropdownMenu.Item disabled>
-                No countries available
-              </DropdownMenu.Item>
-            )}
-          </DropdownMenu.Content>
-        </DropdownMenu.Root>
-      </Container>
-    </div>
+    <Table.Root variant="surface">
+      <Table.Header>
+        <Table.Row>
+          <Table.ColumnHeaderCell>S.No.</Table.ColumnHeaderCell>
+          <Table.ColumnHeaderCell>Customer</Table.ColumnHeaderCell>
+          <Table.ColumnHeaderCell>Product</Table.ColumnHeaderCell>
+          <Table.ColumnHeaderCell>status</Table.ColumnHeaderCell>
+          <Table.ColumnHeaderCell>Timestamp</Table.ColumnHeaderCell>
+        </Table.Row>
+      </Table.Header>
+
+      <Table.Body>
+        {orders?.map((order, index) => (
+          <Table.Row key={index}>
+            <Table.RowHeaderCell>{index + 1}</Table.RowHeaderCell>
+            <Table.RowHeaderCell>{order.customer}</Table.RowHeaderCell>
+            <Table.Cell>{order.product}</Table.Cell>
+            <Table.Cell>{order.status[0]}</Table.Cell>
+            <Table.Cell>{order.timestamp}</Table.Cell>
+          </Table.Row>
+        ))}
+      </Table.Body>
+    </Table.Root>
   );
 };
 

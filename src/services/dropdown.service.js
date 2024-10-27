@@ -23,3 +23,11 @@ export const fetchData = async (endpoint) => {
     throw error.response ? error.response.data : new Error("Network error");
   }
 };
+
+export const postData = async (endpoint) => {
+  try {
+    const response = await axiosInstance.post(endpoint)
+  } catch (error) {
+    
+  }
+}
